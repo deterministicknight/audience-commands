@@ -1,0 +1,22 @@
+body {
+   font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif; 
+}
+
+#buttons li {
+  float: left;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 64px;
+  padding: 0 16px 0 16px;
+  border-style: solid;
+}
+
+#buttons li a {
+  color: #B5B5B5;
+  display: block;
+  text-decoration: none;
+}
+
+#buttons li + li {
+  border-left: 1px solid #DEDEDE;
+}
