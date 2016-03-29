@@ -26,4 +26,10 @@ io.on('connection', function(client) {
     // Emit command to all displays.
     io.emit('command', command);
   });
+  
+  client.on('start', function() {
+    console.log('starting');
+    
+    io.emit('start');
+  });
 });

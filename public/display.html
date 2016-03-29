@@ -2,9 +2,27 @@
 <html lang="en">
   <head>
     <title>Display</title>
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/flipclock.css">
+    <link rel="stylesheet" href="/css/display.css">
   </head>
   <body>
+    <div class="center">
+      <div class="countdown-timer"></div>
+    </div>
+    
+    <div class="center">
+      <button id="start-button" type="button" onclick="start();">Start</button>
+    </div>
+    
+    <div id="command-container">
+      <h2 id="command">Testing</h2>
+    </div>
+    
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/flipclock.min.js"></script>
     <script src="/js/display.js"></script>
   </body>
 </html>
