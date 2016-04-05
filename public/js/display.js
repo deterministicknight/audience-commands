@@ -10,51 +10,44 @@ socket.on('command', function(command) {
   displayCommand(command);
 });
 
-socket.on('start', function() {
-  startTimer();
+socket.on('start', function(time) {
+  startPerformance(time);
+});
+
+socket.on('end', function() {
+  endPerformance();
 });
 
 
 // *******
 // Display 
 
-var performing = false;
-var performanceTime = 5 * 60;
 
 var clock = $('.countdown-timer').FlipClock({
   clockFace: 'MinuteCounter',
   autoStart: false,
-  countdown: true,
-  callbacks: {
-    stop: timerFinished
-  }
+  countdown: true
 });
 
 $(function() {
-  clock.setTime(performanceTime);
+  clock.setTime(0);
 });
 
 function start() {
   socket.emit('start');
 }
 
-function startTimer() {
-  clock.setTime(performanceTime);
+function startPerformance(time) {
+  clock.setTime(time);
   clock.start();
   $('#start-button').hide();
-  performing = true;
 }
 
-function timerFinished() {
+function endPerformance() {
   $('#start-button').show();
-  performing = false;
 }
 
 function displayCommand(command) {
-  if (!performing) {
-    return;
-  }
-  
   $('#command').text(command);
   
   $('#command-container').stop(true, true).animate({ opacity: '1' }, 0);
