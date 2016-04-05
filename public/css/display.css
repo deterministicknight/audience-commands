@@ -21,3 +21,16 @@
   text-align: center;
   font-family: arial, helvetica, sans-serif;
 }
+
+#ticker-list {
+  display: block;
+  white-space: nowrap;
+  font-size: 0;
+  overflow: auto;
+}
+
+.ticker-item {
+  width: 100px;
+  display: inline-block;
+  font-size: 18px;
+}

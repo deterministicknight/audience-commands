@@ -19,6 +19,8 @@ var io = require('socket.io')(server);
 io.on('connection', function(client) {
   console.log(client.id);
   
+  handleConnect(client);
+  
   client.on('command', function(command) { 
     handleCommand(client, command);
   });
@@ -34,16 +36,18 @@ io.on('connection', function(client) {
 
 var performing = false;
 var performanceTime = 5 * 60;
+var performanceStartTime = null;
 var votingWindow = 4;
 var votingTimer = null;
 var currentVotingCountMap = {};
 
 function startPerformance(client) {
   if (performing) {
-      return;
-    }
+    return;
+  }
     
   performing = true;
+  performanceStartTime = new Date();
   io.emit('start', performanceTime);
     
   // Inform all clients that the performance has ended after
@@ -56,10 +60,22 @@ function endPerformance() {
   io.emit('end');
 }
 
+function handleConnect(client) {
+  if (!performing) {
+    return;
+  }
+  
+  var timeElapsed = (new Date() - performanceStartTime) / 1000;
+  var timeRemaining = performanceTime - timeElapsed;
+  client.emit('start', timeRemaining);
+}
+
 function handleCommand(client, command) {
   if (!performing) {
     return;
   }
+  
+  io.emit('command-raw', command);
   
   // To handle voting, we keep track of the number of votes
   // each command receives within a single window. When the

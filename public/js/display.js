@@ -10,6 +10,10 @@ socket.on('command', function(command) {
   displayCommand(command);
 });
 
+socket.on('command-raw', function(command) {
+  displayRawCommand(command);
+});
+
 socket.on('start', function(time) {
   startPerformance(time);
 });
@@ -38,6 +42,8 @@ function start() {
 }
 
 function startPerformance(time) {
+  console.log('start: ' + time);
+  
   clock.setTime(time);
   clock.start();
   $('#start-button').hide();
@@ -48,7 +54,15 @@ function endPerformance() {
 }
 
 function displayCommand(command) {
-  $('#command').text(command);
+  displayText(command);
+}
+
+function displayRawCommand(command) {
+  $('#ticker-list').prepend($('<li>').attr('class', 'ticker-item').append(command));
+}
+
+function displayText(text) {
+  $('#command').text(text);
   
   $('#command-container').stop(true, true).animate({ opacity: '1' }, 0);
   $('#command-container').stop(true, true).animate({ opacity: '0' }, 3000);
