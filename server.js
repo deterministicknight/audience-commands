@@ -34,12 +34,19 @@ io.on('connection', function(client) {
 // *******
 // Performance
 
+var PerformanceModes = Object.freeze({
+  "democracy": 1, 
+  "anarchy": 2
+});
+
 var performing = false;
 var performanceTime = 5 * 60;
+var performanceMode = PerformanceModes.democracy;
 var performanceStartTime = null;
 var votingWindow = 4;
 var votingTimer = null;
-var currentVotingCountMap = {};
+var currentVoteMap = {};
+var currentVoteList = [];
 
 function startPerformance(client) {
   if (performing) {
@@ -89,27 +96,43 @@ function handleCommand(client, command) {
       sendVotedCommand(client);
       
       votingTimer = null;
-      currentVotingCountMap = {};
+      currentVoteMap = {};
+      currentVoteList = [];
     }, votingWindow * 1000);
   }
   
   // Then track the vote.
-  currentVotingCountMap[command] = (currentVotingCountMap[command] || 0) + 1;
+  currentVoteMap[command] = (currentVoteMap[command] || 0) + 1;
+  currentVoteList.push(command);
 }
 
 function sendVotedCommand(client) {
+  var vote = null;
+  
   // Determine the vote.
-  var votes = [];
-  for (var command in currentVotingCountMap) {
-    votes.push([command, currentVotingCountMap[command]]);
+  if (performanceMode == PerformanceModes.democracy) {
+    // Democracy voting scheme.
+    var votes = [];
+    for (var command in currentVoteMap) {
+      votes.push([command, currentVoteMap[command]]);
+    }
+    votes.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+    
+    vote = votes[0][0];
+  } else {
+    // Anarchy voting scheme. Pick random vote.
+    vote = currentVoteList[Math.floor(Math.random() * currentVoteList.length)];
   }
-  votes.sort(function(a, b) {
-    return b[1] - a[1];
-  });
   
-  if (votes.length > 0) {
-    io.emit('command', votes[0][0]);
+  // Update the current voting scheme, if needed.
+  if (PerformanceModes[vote] !== undefined) {
+    performanceMode = vote;
   }
   
-  console.log(votes);
+  // Send vote to clients.
+  if (vote != null) {
+    io.emit('command', vote);
+  }
 }
