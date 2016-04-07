@@ -26,6 +26,7 @@ socket.on('end', function() {
 // *******
 // Display 
 
+var supportedImages = null;
 
 var clock = $('.countdown-timer').FlipClock({
   clockFace: 'MinuteCounter',
@@ -34,6 +35,10 @@ var clock = $('.countdown-timer').FlipClock({
 });
 
 $(function() {
+  $.getJSON('images.json', function(data) {
+    supportedImages = data;
+  });
+  
   clock.setTime(0);
 });
 
@@ -50,15 +55,28 @@ function startPerformance(time) {
 }
 
 function endPerformance() {
+  clock.reset();
   $('#start-button').show();
+  $('#phrase-image').attr('src', '');
 }
 
 function displayCommand(command) {
+  // If the command is an image for a phrase, update our current image.
+  if ($.inArray(command, supportedImages) != -1) {
+    $('#phrase-image').attr('src', 'img/' + command + '.png');
+  }
+  
   displayText(command);
 }
 
 function displayRawCommand(command) {
-  $('#ticker-list').prepend($('<li>').attr('class', 'ticker-item').append(command));
+  var item = $('<li>').attr('class', 'ticker-item').append(command);
+  $('#ticker-list').prepend(item);
+  
+  // TODO: find a way animate a slide on all items.
+  item.delay(500).fadeOut(300, function(){
+    item.remove();
+  });
 }
 
 function displayText(text) {

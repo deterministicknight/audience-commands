@@ -23,14 +23,20 @@
 }
 
 #ticker-list {
+  height: 50px;
+  width: 50%;
+  margin-left: auto; 
+  margin-right: auto;
   display: block;
   white-space: nowrap;
-  font-size: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .ticker-item {
-  width: 100px;
+  color: #ABABAB;
+  opacity: 0.5;
+  padding: 0 20px;
+  font-size: 32px;
   display: inline-block;
-  font-size: 18px;
+  font-family: arial, helvetica, sans-serif;
 }
