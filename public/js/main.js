@@ -1,17 +1,34 @@
 // main.js
 
 $(function() {
-  $.getJSON('commands.json', function(data) {
-    for (var i in data) {
-      // Add a clickable element for each command.
-      $('#buttons').append('<li><a href="#" onclick="handle(this.innerHTML);">' + data[i] + '</a></li>');
-    }
+  $.getJSON('commands.json', function(commands) {
+    $.getJSON('images.json', function(images) {
+      for (var i in commands) {
+        // Create text or image element.
+        if ($.inArray(commands[i], images) != -1) {
+          $('#buttons')
+            .append($('<li>')
+              .attr('href', '#/')
+              .attr('onclick', 'handle(this);')
+              .attr('data-command', commands[i])
+              .append($('<img>')
+                .attr('src', 'img/' + commands[i] + '.png')));
+        } else {
+          $('#buttons')
+            .append($('<li>')
+              .attr('href', '#/')
+              .attr('onclick', 'handle(this);')
+              .attr('data-command', commands[i])
+              .text(commands[i]));
+        }
+      }
+    });
   });
 });
 
 var socket = /*global io*/ io();
 
-function handle(command) {
+function handle(element) {
   // Send command back to the server.
-  socket.emit('command', command);
+  socket.emit('command', element.getAttribute('data-command'));
 }
