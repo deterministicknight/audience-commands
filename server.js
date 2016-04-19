@@ -39,14 +39,22 @@ var PerformanceModes = Object.freeze({
   "anarchy": 2
 });
 
+var VotingModes = Object.freeze({
+  "time": 1, 
+  "count": 2
+});
+
 var performing = false;
 var performanceTime = 5 * 60;
 var performanceMode = PerformanceModes.democracy;
 var performanceStartTime = null;
 var votingWindow = 4;
+var votingWindowCount = 5;
 var votingTimer = null;
+var votingMode = VotingModes.time;
 var currentVoteMap = {};
 var currentVoteList = [];
+var currentVoteCount = 0;
 
 function startPerformance(client) {
   if (performing) {
@@ -84,26 +92,46 @@ function handleCommand(client, command) {
   
   io.emit('command-raw', command);
   
-  // To handle voting, we keep track of the number of votes
-  // each command receives within a single window. When the
-  // window passes, we send the command that had the most
-  // votes, or a random value if all have the same amount
-  // of votes.
-  //
-  // First set up the voting window.
-  if (votingTimer == null) {
-    votingTimer = setTimeout(function() {
-      sendVotedCommand(client);
-      
-      votingTimer = null;
-      currentVoteMap = {};
-      currentVoteList = [];
-    }, votingWindow * 1000);
+  function reset() {
+    currentVoteMap = {};
+    currentVoteList = [];
+    currentVoteCount = 0;    
   }
   
-  // Then track the vote.
-  currentVoteMap[command] = (currentVoteMap[command] || 0) + 1;
-  currentVoteList.push(command);
+  if (votingMode == VotingModes.count) {
+    // Count-based.
+    //
+    // If we've hit the voting window count, calculate vote.
+    currentVoteMap[command] = (currentVoteMap[command] || 0) + 1;
+    currentVoteList.push(command);
+    currentVoteCount++;
+    
+    if (currentVoteCount == votingWindowCount) {
+      sendVotedCommand(client);
+      reset();
+    }
+  } else {
+    // Time-based.
+    //
+    // To handle voting, we keep track of the number of votes
+    // each command receives within a single window. When the
+    // window passes, we send the command that had the most
+    // votes, or a random value if all have the same amount
+    // of votes.
+    //
+    // First set up the voting window.
+    if (votingTimer == null) {
+      votingTimer = setTimeout(function() {
+        sendVotedCommand(client);
+        
+        reset();
+      }, votingWindow * 1000);
+    }
+  
+    // Then track the vote.
+    currentVoteMap[command] = (currentVoteMap[command] || 0) + 1;
+    currentVoteList.push(command);
+  }
 }
 
 function sendVotedCommand(client) {
