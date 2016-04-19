@@ -62,7 +62,10 @@ function startPerformance(client) {
   }
     
   performing = true;
+  votingMode = VotingModes.time;
   performanceStartTime = new Date();
+  performanceMode = PerformanceModes.democracy;
+  
   io.emit('start', performanceTime);
     
   // Inform all clients that the performance has ended after
