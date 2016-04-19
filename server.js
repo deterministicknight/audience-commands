@@ -93,6 +93,7 @@ function handleCommand(client, command) {
   io.emit('command-raw', command);
   
   function reset() {
+    votingTimer = null;
     currentVoteMap = {};
     currentVoteList = [];
     currentVoteCount = 0;    
